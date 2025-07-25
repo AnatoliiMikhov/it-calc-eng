@@ -1,0 +1,35 @@
+{
+  "name": "it-cost-calculator",
+  "version": "1.0.0",
+  "description": "A dynamic cost calculator for IT services, built with Netlify and Firebase.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "netlify dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnatoliiMikhov/it-calc-eng.git"
+  },
+  "keywords": [
+    "netlify",
+    "firebase",
+    "serverless",
+    "javascript",
+    "calculator",
+    "jamstack"
+  ],
+  "author": "Anatolii Mikhov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AnatoliiMikhov/it-calc-eng/issues"
+  },
+  "homepage": "https://github.com/AnatoliiMikhov/it-calc-eng#readme",
+  "dependencies": {
+    "firebase-admin": "^13.4.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
