@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <!-- Include the Netlify Identity widget script for authentication -->
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <!-- Link to the admin-specific stylesheet -->
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <!-- This div will be populated by the Netlify Identity widget -->
+        <div data-netlify-identity-menu></div>
+
+        <div class="header-container">
+            <h1>Admin Panel: Rate Management</h1>
+            <a href="/" class="back-to-site-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>Back to Site</span>
+            </a>
+        </div>
+
+        <!-- This message shows if the user is not logged in -->
+        <div id="auth-message">
+            <p>Please log in to manage the rates.</p>
+            <button onclick="netlifyIdentity.open();">Log In</button>
+        </div>
+
+        <!-- This shows while data is being loaded from the database -->
+        <div id="loading" class="hidden">
+            <p>Loading data...</p>
+        </div>
+
+        <!-- The main form for editing rates, hidden by default -->
+        <form id="rates-form" class="hidden">
+            <fieldset>
+                <legend>Base Rate</legend>
+                <div class="form-group">
+                    <label for="hourlyRate">Hourly Rate ($)</label>
+                    <input type="number" id="hourlyRate" name="hourlyRate" required>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Project Type (hours)</legend>
+                <div class="form-group">
+                    <label for="project-landing">Landing Page</label>
+                    <input type="number" id="project-landing" name="project.landing" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-portfolio">Portfolio Site</label>
+                    <input type="number" id="project-portfolio" name="project.portfolio" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-corporate">Corporate Site</label>
+                    <input type="number" id="project-corporate" name="project.corporate" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-ecommerce">E-commerce Store</label>
+                    <input type="number" id="project-ecommerce" name="project.ecommerce" required>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Design (hours)</legend>
+                <div class="form-group">
+                    <label for="design-template">Template-based</label>
+                    <input type="number" id="design-template" name="design.template" required>
+                </div>
+                <div class="form-group">
+                    <label for="design-unique">Unique Design</label>
+                    <input type="number" id="design-unique" name="design.unique" required>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Modules (hours)</legend>
+                <div class="form-group">
+                    <label for="modules-feedbackForm">Feedback Form</label>
+                    <input type="number" id="modules-feedbackForm" name="modules.feedbackForm" required>
+                </div>
+                <div class="form-group">
+                    <label for="modules-gallery">Gallery</label>
+                    <input type="number" id="modules-gallery" name="modules.gallery" required>
+                </div>
+                <div class="form-group">
+                    <label for="modules-blog">Blog</label>
+                    <input type="number" id="modules-blog" name="modules.blog" required>
+                </div>
+                <div class="form-group">
+                    <label for="modules-socialMedia">Social Media Integration</label>
+                    <input type="number" id="modules-socialMedia" name="modules.socialMedia" required>
+                </div>
+                <div class="form-group">
+                    <label for="modules-basicSeo">Basic SEO</label>
+                    <input type="number" id="modules-basicSeo" name="modules.basicSeo" required>
+                </div>
+            </fieldset>
+            <div class="button-container">
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+    <!-- Link to the admin-specific JavaScript file -->
+    <script src="/js/admin.js"></script>
+</body>
+</html>
