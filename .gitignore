@@ -1,0 +1,29 @@
+# macOS specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VS Code specific files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Dependency directories
+node_modules/
+
+# Netlify specific files
+.netlify/
+
+# Environment variables file (VERY IMPORTANT)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build output
+dist/
+build/
+
