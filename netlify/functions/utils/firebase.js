@@ -12,11 +12,16 @@ if (!admin.apps.length) {
   let serviceAccount;
 
   // When running on Netlify, the service account is a Base64 encoded string.
-  if (process.env.CONTEXT) {
+  // The service account is always expected to be a Base64 encoded string,
+  // whether running on Netlify or locally via `netlify dev`.
+  // This simplifies environment variable handling.
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf-8'));
   } else {
-    // When running locally via `netlify dev`, it's a direct JSON string from the .env file.
-    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    console.error('FIREBASE_SERVICE_ACCOUNT environment variable is not set. Firebase Admin SDK cannot be initialized.');
+    // In a real application, you might want to throw an error or handle this more gracefully.
+    // For now, we'll let the app proceed, but Firebase operations will likely fail.
+    throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is missing.');
   }
 
   admin.initializeApp({

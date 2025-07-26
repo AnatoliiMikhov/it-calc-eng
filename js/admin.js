@@ -1,111 +1,104 @@
 // js/admin.js
+
 document.addEventListener('DOMContentLoaded', () => {
-    const authMessage = document.getElementById('auth-message');
-    const loadingMessage = document.getElementById('loading');
+    const loadingIndicator = document.getElementById('loading');
     const ratesForm = document.getElementById('rates-form');
-    const saveButton = ratesForm.querySelector('button[type="submit"]');
+    const authMessage = document.getElementById('auth-message'); // We bring this back for simplicity
 
-    // Function to show/hide elements
-    const toggleVisibility = (element, show) => {
-        if (element) {
-            element.classList.toggle('hidden', !show);
-        }
+    // --- Helper Functions ---
+    const showLoading = () => {
+        authMessage.classList.add('hidden');
+        ratesForm.classList.add('hidden');
+        loadingIndicator.classList.remove('hidden');
     };
 
-    // Function to display a message (e.g., success or error)
-    const displayMessage = (message, isError = false) => {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isError ? 'error' : 'success'}`;
-        messageDiv.textContent = message;
-        messageDiv.style.padding = '1rem';
-        messageDiv.style.marginTop = '1rem';
-        messageDiv.style.borderRadius = '5px';
-        messageDiv.style.textAlign = 'center';
-        messageDiv.style.fontWeight = 'bold';
-        messageDiv.style.backgroundColor = isError ? '#ffebee' : '#e8f5e9';
-        messageDiv.style.color = isError ? '#c62828' : '#2e7d32';
-        ratesForm.parentNode.insertBefore(messageDiv, ratesForm.nextSibling);
-
-        // Remove message after a few seconds
-        setTimeout(() => {
-            messageDiv.remove();
-        }, 5000);
+    const showForm = () => {
+        authMessage.classList.add('hidden');
+        loadingIndicator.classList.add('hidden');
+        ratesForm.classList.remove('hidden');
     };
 
-    // Function to fetch rates from the Netlify function
+    const showLoginMessage = () => {
+        ratesForm.classList.add('hidden');
+        loadingIndicator.classList.add('hidden');
+        authMessage.classList.remove('hidden');
+    };
+
+    // --- Data Fetching ---
     const fetchRates = async () => {
-        toggleVisibility(loadingMessage, true); // Show loading message
-        toggleVisibility(ratesForm, false); // Hide form
-
         try {
             const response = await fetch('/.netlify/functions/getRates');
-            const data = await response.json();
-
-            if (response.ok) {
-                // Populate the form with fetched rates
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const rates = await response.json();
+            
+            // Populate the form with the fetched data
+            const populateForm = (data) => {
                 for (const key in data) {
                     if (typeof data[key] === 'object' && data[key] !== null) {
-                        // Handle nested objects (project, design, modules)
                         for (const subKey in data[key]) {
-                            const input = document.getElementById(`${key}-${subKey}`);
-                            if (input) {
-                                input.value = data[key][subKey];
+                            const inputName = `${key}.${subKey}`;
+                            const inputElement = ratesForm.querySelector(`[name="${inputName}"]`);
+                            if (inputElement) {
+                                inputElement.value = data[key][subKey];
                             }
                         }
                     } else {
-                        // Handle top-level keys (hourlyRate)
-                        const input = document.getElementById(key);
-                        if (input) {
-                            input.value = data[key];
+                        const inputElement = ratesForm.querySelector(`[name="${key}"]`);
+                        if (inputElement) {
+                            inputElement.value = data[key];
                         }
                     }
                 }
-                toggleVisibility(ratesForm, true); // Show form after loading data
-            } else {
-                displayMessage(`Error loading rates: ${data.message || 'Unknown error'}`, true);
-                console.error('Failed to fetch rates:', data.message);
-            }
+            };
+            
+            populateForm(rates);
+            showForm();
+
         } catch (error) {
-            displayMessage(`Network error: ${error.message}`, true);
-            console.error('Network error fetching rates:', error);
-        } finally {
-            toggleVisibility(loadingMessage, false); // Hide loading message
+            console.error('Failed to fetch rates:', error);
+            loadingIndicator.textContent = 'Failed to load rates. Please try refreshing.';
         }
     };
 
-    // Function to handle form submission
-    const handleFormSubmit = async (event) => {
-        event.preventDefault(); // Prevent default form submission
-        saveButton.disabled = true; // Disable button to prevent multiple submissions
-        saveButton.textContent = 'Saving...';
+    // --- Form Submission ---
+    ratesForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const submitButton = ratesForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = 'Saving...';
+        submitButton.disabled = true;
 
-        // Collect form data
         const formData = new FormData(ratesForm);
-        const rates = {};
+        const newRates = { project: {}, design: {}, modules: {} };
 
-        // Parse form data into a nested object structure
         for (const [key, value] of formData.entries()) {
-            const parts = key.split('.');
-            let current = rates;
-            for (let i = 0; i < parts.length; i++) {
-                const part = parts[i];
-                if (i === parts.length - 1) {
-                    // Convert value to number, ensure it's not negative
-                    const numValue = parseFloat(value);
-                    if (isNaN(numValue) || numValue < 0) {
-                        displayMessage(`Invalid input for ${key}: Must be a non-negative number.`, true);
-                        saveButton.disabled = false;
-                        saveButton.textContent = 'Save Changes';
-                        return; // Stop submission if validation fails
-                    }
-                    current[part] = numValue;
-                } else {
-                    if (!current[part]) {
-                        current[part] = {};
-                    }
-                    current = current[part];
-                }
+            // Input validation for non-negative numbers
+            const numValue = parseFloat(value);
+            if (isNaN(numValue) || numValue < 0) {
+                alert('Invalid input: All values must be non-negative numbers.');
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+                return;
             }
+
+            if (key.includes('.')) {
+                const [category, subKey] = key.split('.');
+                newRates[category][subKey] = numValue;
+            } else {
+                newRates[key] = numValue;
+            }
+        }
+
+        const user = netlifyIdentity.currentUser();
+        const token = user ? await user.jwt() : null;
+
+        if (!token) {
+            alert('Authentication error. Please refresh and log in again.');
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+            return;
         }
 
         try {
@@ -113,52 +106,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(rates),
+                body: JSON.stringify(newRates)
             });
-            const data = await response.json();
 
-            if (response.ok) {
-                displayMessage('Rates updated successfully!', false);
-                console.log('Rates updated:', data.message);
-            } else {
-                displayMessage(`Error updating rates: ${data.message || 'Unknown error'}`, true);
-                console.error('Failed to update rates:', data.message);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Server error');
             }
+            
+            submitButton.textContent = 'Saved!';
+            setTimeout(() => {
+                submitButton.textContent = originalButtonText;
+            }, 2000);
+
         } catch (error) {
-            displayMessage(`Network error: ${error.message}`, true);
-            console.error('Network error updating rates:', error);
+            console.error('Failed to update rates:', error);
+            alert(`Failed to save rates: ${error.message}`);
+            submitButton.textContent = originalButtonText;
         } finally {
-            saveButton.disabled = false; // Re-enable button
-            saveButton.textContent = 'Save Changes';
-        }
-    };
-
-    // Netlify Identity event listener
-    netlifyIdentity.on('init', user => {
-        if (user) {
-            // User is logged in
-            toggleVisibility(authMessage, false); // Hide login message
-            // Check if user has 'admin' role
-            const roles = user.app_metadata.roles || [];
-            if (roles.includes('admin')) {
-                fetchRates(); // Fetch rates if admin
-            } else {
-                displayMessage('You do not have administrative privileges to access this panel.', true);
-                toggleVisibility(loadingMessage, false); // Hide loading
-                toggleVisibility(ratesForm, false); // Ensure form is hidden
-            }
-        } else {
-            // User is not logged in
-            toggleVisibility(authMessage, true); // Show login message
-            toggleVisibility(loadingMessage, false); // Hide loading
-            toggleVisibility(ratesForm, false); // Hide form
+            submitButton.disabled = false;
         }
     });
 
-    // Add event listener for form submission
-    ratesForm.addEventListener('submit', handleFormSubmit);
+    // --- Authentication Logic ---
+    
+    // This is the most reliable way: check the user state right away.
+    const user = netlifyIdentity.currentUser();
+    if (user && user.app_metadata?.roles?.includes('admin')) {
+        showLoading();
+        fetchRates();
+    } else {
+        showLoginMessage();
+    }
 
-    // Initialize Netlify Identity widget
-    netlifyIdentity.init();
+    // To solve the race condition reliably, we revert to the simple and effective
+    // page reload strategy from the original project.
+    netlifyIdentity.on('login', () => {
+        location.reload();
+    });
+
+    netlifyIdentity.on('logout', () => {
+        location.reload();
+    });
 });

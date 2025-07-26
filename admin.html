@@ -22,7 +22,7 @@
             </a>
         </div>
 
-        <!-- This message shows if the user is not logged in -->
+        <!-- RESTORED: This block is required by admin.js to manage the login view -->
         <div id="auth-message">
             <p>Please log in to manage the rates.</p>
             <button onclick="netlifyIdentity.open();">Log In</button>
@@ -100,7 +100,7 @@
             </div>
         </form>
     </div>
-    <!-- Link to the admin-specific JavaScript file -->
-    <script src="/js/admin.js"></script>
+    <!-- We keep the cache-busting for good measure -->
+    <script src="/js/admin.js?v=1.1"></script>
 </body>
 </html>
