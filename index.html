@@ -1,13 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT Cost Calculator - Admin</title>
-  <!-- This is the script that will handle the login and invitation -->
-  <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Project Cost Calculator</title>
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Netlify Identity script is kept for potential future use, though not primary on this page -->
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <h1>Loading Identity Service...</h1>
+
+    <main class="calculator-container">
+        <div class="disclaimer-banner">
+            <p><strong>For Demonstration Purposes Only:</strong> This calculator provides an approximate estimate and is not a commercial offer.</p>
+        </div>
+        <div class="theme-switcher">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle"></label>
+        </div>
+        <h1>IT Project Cost Calculator</h1>
+        <p>Estimate the approximate cost and timeline for your future project.</p>
+
+        <section id="top-results" class="top-results-container">
+            <div class="result-item">
+                <span>Estimated Cost:</span>
+                <span id="top-total-cost" class="highlight">$0</span>
+            </div>
+            <div class="result-item">
+                <span>Estimated Timeline:</span>
+                <span id="top-total-timeline" class="highlight">0 wk</span>
+            </div>
+        </section>
+
+        <form id="calc-form">
+            <!-- Project Type Section -->
+            <fieldset>
+                <legend>1. Project Type</legend>
+                <div class="option">
+                    <input type="radio" id="type-landing" name="projectType" value="landing" checked>
+                    <label for="type-landing"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6s1.5-2 5-2 5 2 5 2v14s-1.5-2-5-2-5 2-5 2V6z"></path><path d="M12 6v14"></path></svg>Landing Page</label>
+                    <span class="price-change"></span>
+                </div>
+                <div class="option">
+                    <input type="radio" id="type-portfolio" name="projectType" value="portfolio">
+                    <label for="type-portfolio"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect x="2" y="2" width="12" height="8" rx="2"></rect><path d="M6 12h4"></path></svg>Portfolio Site (up to 5 pages)</label>
+                    <span class="price-change"></span>
+                </div>
+                <div class="option">
+                    <input type="radio" id="type-corporate" name="projectType" value="corporate">
+                    <label for="type-corporate"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>Corporate Site</label>
+                    <span class="price-change"></span>
+                </div>
+                <div class="option">
+                    <input type="radio" id="type-ecommerce" name="projectType" value="ecommerce">
+                    <label for="type-ecommerce"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>E-commerce Store (basic)</label>
+                    <span class="price-change"></span>
+                </div>
+            </fieldset>
+
+            <!-- Design Section -->
+            <fieldset>
+                <legend>2. Design</legend>
+                <div class="option">
+                    <input type="radio" id="design-template" name="designType" value="template" checked>
+                    <label for="design-template"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>Template-based</label>
+                    <span class="price-change"></span>
+                </div>
+                <div class="option">
+                    <input type="radio" id="design-unique" name="designType" value="unique">
+                    <label for="design-unique"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>Unique design from scratch</label>
+                    <span class="price-change"></span>
+                </div>
+            </fieldset>
+
+            <!-- Additional Modules Section -->
+            <fieldset>
+                <legend>3. Additional Modules</legend>
+                <div class="option">
+                    <input type="checkbox" id="mod-feedback" name="module" value="feedbackForm">
+                    <label for="mod-feedback"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>Feedback Form</label>
+                    <span class="price-change"></span>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="mod-gallery" name="module" value="gallery">
+                    <label for="mod-gallery"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>Photo Gallery</label>
+                    <span class="price-change"></span>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="mod-blog" name="module" value="blog">
+                    <label for="mod-blog"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg>Blog / News</label>
+                    <span class="price-change"></span>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="mod-social" name="module" value="socialMedia">
+                    <label for="mod-social"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>Social Media Integration</label>
+                    <span class="price-change"></span>
+                </div>
+                 <div class="option">
+                    <input type="checkbox" id="mod-seo" name="module" value="basicSeo">
+                    <label for="mod-seo"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Basic SEO Optimization</label>
+                    <span class="price-change"></span>
+                </div>
+            </fieldset>
+        </form>
+
+        <section id="results">
+            <h2>Estimated Calculation:</h2>
+            <div class="result-item">
+                <span>Approximate Cost:</span>
+                <span id="total-cost" class="highlight">$0</span>
+            </div>
+            <div class="result-item">
+                <span>Approximate Timeline:</span>
+                <span id="total-timeline" class="highlight">0 weeks</span>
+            </div>
+            <p class="disclaimer">This is a preliminary estimate. For a detailed proposal, please contact us.</p>
+            <button type="button" id="order-btn" class="cta-button">Get a Detailed Quote</button>
+        </section>
+
+        <footer class="site-footer">
+            <nav class="footer-nav">
+                <a href="/privacy-policy.html">Privacy Policy</a>
+                <a href="/admin.html">Admin</a>
+            </nav>
+            <div class="footer-info">
+                <span>&copy; <span id="current-year"></span> Anatolii Mikhov. All rights reserved.</span>
+                <a href="https://github.com/AnatoliiMikhov/it-calc-eng" class="github-link" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Modal Window -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            <h2>Request a Detailed Quote</h2>
+            <p>Fill out the form, and we will send you a detailed proposal.</p>
+            
+            <form name="contact" class="modal-form" netlify action="/thank-you.html">
+                <input type="hidden" name="calculated-cost">
+                <input type="hidden" name="calculated-timeline">
+                <input type="hidden" name="selected-options">
+
+                <div class="form-group">
+                    <label for="name">Your Name:<span class="required-asterisk">*</span></label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Your Email:<span class="required-asterisk">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group-checkbox">
+                    <input type="checkbox" id="call-request">
+                    <label for="call-request">Request a call back</label>
+                </div>
+                <div id="phone-group" class="form-group hidden">
+                    <label for="phone">Your Phone:</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="comment">Comment:</label>
+                    <textarea id="comment" name="comment" rows="4"></textarea>
+                </div>
+                <button type="submit" class="cta-button">Send Request</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js" defer></script>
 </body>
 </html>
