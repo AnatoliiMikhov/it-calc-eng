@@ -18,14 +18,16 @@ if (!admin.apps.length) {
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf-8'));
   } else {
-    console.error('FIREBASE_SERVICE_ACCOUNT environment variable is not set. Firebase Admin SDK cannot be initialized.');
+    console.error(
+      'FIREBASE_SERVICE_ACCOUNT environment variable is not set. Firebase Admin SDK cannot be initialized.'
+    );
     // In a real application, you might want to throw an error or handle this more gracefully.
     // For now, we'll let the app proceed, but Firebase operations will likely fail.
     throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is missing.');
   }
 
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert(serviceAccount),
   });
 }
 
