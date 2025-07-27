@@ -21,6 +21,7 @@ const phoneGroup = document.getElementById('phone-group')
 
 /* --- State Management --- */
 let rates = {} // To store fetched rates
+const STORAGE_KEY = 'calculatorState';
 let lastCalculatedHours = 0 // To track changes for price indicators
 
 /* --- Utility Functions --- */
@@ -60,6 +61,35 @@ const updateTotals = (cost, timeline) => {
   Object.values(totalCostElements).forEach((el) => (el.textContent = formattedCost))
   Object.values(totalTimelineElements).forEach((el) => (el.textContent = formattedTimeline))
 }
+
+const saveState = () => {
+    const formData = new FormData(form);
+    const state = {
+        projectType: formData.get('projectType'),
+        designType: formData.get('designType'),
+        modules: formData.getAll('module'),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+};
+
+const loadState = () => {
+    const savedStateJSON = localStorage.getItem(STORAGE_KEY);
+    if (!savedStateJSON) return;
+    try {
+        const savedState = JSON.parse(savedStateJSON);
+        if (savedState.projectType) form.querySelector(`input[name="projectType"][value="${savedState.projectType}"]`).checked = true;
+        if (savedState.designType) form.querySelector(`input[name="designType"][value="${savedState.designType}"]`).checked = true;
+        if (savedState.modules) {
+            savedState.modules.forEach(moduleValue => {
+                const checkbox = form.querySelector(`input[name="module"][value="${moduleValue}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+    } catch (e) {
+        console.error("Failed to load state from localStorage", e);
+        localStorage.removeItem(STORAGE_KEY);
+    }
+};
 
 /**
  * Displays a temporary price/hour change indicator next to an option.
@@ -126,6 +156,7 @@ const calculateTotal = () => {
   }
 
   lastCalculatedHours = totalHours // Update the last calculated value
+  saveState();
 }
 
 /* --- Event Handlers --- */
@@ -190,8 +221,9 @@ const initializeCalculator = async () => {
     const response = await fetch('/.netlify/functions/getRates')
     if (!response.ok) throw new Error('Failed to fetch rates')
 
-    rates = await response.json()
-    calculateTotal() // Perform initial calculation
+    rates = await response.json();
+    loadState();
+    calculateTotal(); // Perform initial calculation
     form.addEventListener('change', calculateTotal)
   } catch (error) {
     console.error('Initialization Error:', error)
